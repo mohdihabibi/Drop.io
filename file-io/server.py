@@ -6,19 +6,51 @@ import logging
 import grpc
 import payload_pb2
 import payload_pb2_grpc
-import subprocess
-from os import path
+import redis
+
 _ONE_DAY_IN_SECONDS = 60 * 60 * 24
-DEBUG = False
+DEBUG = True
 
 class FileService(payload_pb2_grpc.RouteServiceServicer):
 
-    #TODO: store paylaod in database or local
+    def openDB(self):
+        r = redis.Redis(
+            host='localhost',
+            port=6379)
+
+        return r
+
+    def store_data(self, id, data):
+        r = self.openDB()
+        r.set(id, data)
+        if DEBUG:
+            print "Inside store data. Data stored with id : {} successfully".format(id)
+
+    def get_data(self, id):
+        r = self.openDB()
+        data = r.get(id)
+        if DEBUG:
+            print "Inside get data. Data is : {}".format(id)
+        return data
+
+    def is_data_available(self, id):
+        r = self.openDB()
+        if r.get(id):
+            return True
+        else:
+            return False
+
     def request(self, request, context):
-        print("Request recieved from client. Client's IP address is: {}".format(request.payload))
-        return payload_pb2.Route(
-            payload= "server"
-        )
+        if DEBUG:
+            print("Request recieved from client. Message is : {}".format(request))
+        if self.is_data_available(request.id):
+            data = self.get_data(request.id)
+            return payload_pb2.Route(payload = data)
+        else:
+            self.store_data(request.id, request.payload)
+            return payload_pb2.Route(
+                payload= "Stored successfully!!"
+            )
 
 
 def serve():
