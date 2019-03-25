@@ -5,6 +5,7 @@ import grpc
 import heartbeat_pb2
 import heartbeat_pb2_grpc
 import subprocess
+import ps_utils
 
 import sys
 sys.path.append('../')
@@ -21,17 +22,17 @@ class Heartbeat(heartbeat_pb2_grpc.HearBeatServicer):
 
     def getStatus(self, request, context):
         print("Request recieved from client. Client's IP address is: {}".format(request.ip))
-        global myIp
+        global myIp, myCPU, myMem
+        process = psutil.Process(os.getpid())
         return heartbeat_pb2.HeartBeatResponse(
             ip=myIp,
             live=True,
-            cpu_usage=0.8,
+            cpu_usage= psutil.cpu_percent(),
             disk_space=0.7,
             num_process=11,
-            num_thread=20,
             idle=0.9,
             tot_mem=1.5,
-            used_mem=0.9,
+            used_mem=process.memory_percent() * 100,
             data_read_per_sec=100.0,
             data_write_per_sec=200.0,
             data_recieve_per_sec=20.0,
@@ -61,7 +62,6 @@ def getMyIp():
     if DEBUG:
         print "Inside get my ips. My device ip list is ", my_ips
     myIp = ','.join(my_ips)
-
 
 if __name__ == '__main__':
     getMyIp()
