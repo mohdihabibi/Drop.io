@@ -5,7 +5,8 @@ import grpc
 import heartbeat_pb2
 import heartbeat_pb2_grpc
 import subprocess
-import ps_utils
+import psutil
+import os
 
 import sys
 sys.path.append('../')
@@ -22,7 +23,7 @@ class Heartbeat(heartbeat_pb2_grpc.HearBeatServicer):
 
     def getStatus(self, request, context):
         print("Request recieved from client. Client's IP address is: {}".format(request.ip))
-        global myIp, myCPU, myMem
+        global myIp
         process = psutil.Process(os.getpid())
         return heartbeat_pb2.HeartBeatResponse(
             ip=myIp,
@@ -43,7 +44,7 @@ class Heartbeat(heartbeat_pb2_grpc.HearBeatServicer):
 def serve():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     heartbeat_pb2_grpc.add_HearBeatServicer_to_server(Heartbeat(), server)
-    server.add_insecure_port(server_config.get('host')+':'+server_config.get('port'))
+    server.add_insecure_port(server_config.get('host')+':'+str(server_config.get('port')))
     server.start()
     try:
         while True:
