@@ -8,6 +8,11 @@ import payload_pb2
 import payload_pb2_grpc
 import redis
 
+import sys
+sys.path.append('../')
+
+from config.config import server_config
+
 _ONE_DAY_IN_SECONDS = 60 * 60 * 24
 DEBUG = True
 
@@ -56,7 +61,7 @@ class FileService(payload_pb2_grpc.RouteServiceServicer):
 def serve():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     payload_pb2_grpc.add_RouteServiceServicer_to_server(FileService(), server)
-    server.add_insecure_port('[::]:3000')
+    server.add_insecure_port(server_config.get('host')+ ':' + str(server_config.get('port')))
     server.start()
     try:
         while True:

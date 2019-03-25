@@ -6,6 +6,11 @@ import heartbeat_pb2
 import heartbeat_pb2_grpc
 import subprocess
 
+import sys
+sys.path.append('../')
+
+from config.config import server_config
+
 _ONE_DAY_IN_SECONDS = 60 * 60 * 24
 DEBUG = False
 
@@ -37,7 +42,7 @@ class Heartbeat(heartbeat_pb2_grpc.HearBeatServicer):
 def serve():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     heartbeat_pb2_grpc.add_HearBeatServicer_to_server(Heartbeat(), server)
-    server.add_insecure_port('[::]:3000')
+    server.add_insecure_port(server_config.get('host')+':'+server_config.get('port'))
     server.start()
     try:
         while True:
