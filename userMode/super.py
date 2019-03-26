@@ -1,15 +1,17 @@
+import sys
+sys.path.append('../')
 import fileIO.server as super_server
 import heartbeat.heartbeat_client as hb_client
 import threading
 from config.config import server_config
 import grpc
-import payload_pb2
-import payload_pb2_grpc
+import fileIO.payload_pb2 as payload_pb2
+import fileIO.payload_pb2_grpc as payload_pb2_grpc
 import time
 from concurrent import futures
 
 
-ips = ['ip1', 'ip2', 'ip3']
+ips = ['localhost', 'ip2', 'ip3']
 
 stat = [None]*len(ips)
 
