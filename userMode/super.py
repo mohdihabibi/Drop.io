@@ -11,7 +11,7 @@ import time
 from concurrent import futures
 
 
-ips = ['localhost', 'ip2', 'ip3']
+ips = ['ip1','ip2','ip3']
 
 stat = [None]*len(ips)
 
@@ -21,7 +21,7 @@ for i, ip in enumerate(ips):
     t.start()
 
 #TODO: fix simple file service to read and write. right now just write
-#TODO: implement system file logging to understand where the file is
+#TODO: implement system file logging to understand where the file is (Hashing)
 class SimpleFileService(payload_pb2_grpc.RouteServiceServicer):
     def __init__(self):
         self.data = ""
@@ -50,8 +50,8 @@ class SimpleFileService(payload_pb2_grpc.RouteServiceServicer):
 
 def serve():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
-    payload_pb2_grpc.add_RouteServiceServicer_to_server(super_server.SimpleFileService(), server)
-    server.add_insecure_port(server_config.get('host')+ ':' + str(server_config.get('port')))
+    payload_pb2_grpc.add_RouteServiceServicer_to_server(SimpleFileService(), server)
+    server.add_insecure_port('[::]:'+ str(server_config.get('port')))
     server.start()
     try:
         while True:
@@ -59,4 +59,6 @@ def serve():
     except KeyboardInterrupt:
         server.stop(0)
 
-serve()
+if __name__ == '__main__':
+    print "Super node started..."
+    serve()

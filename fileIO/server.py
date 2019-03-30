@@ -60,14 +60,15 @@ class FileService(payload_pb2_grpc.RouteServiceServicer):
 def serve():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     payload_pb2_grpc.add_RouteServiceServicer_to_server(FileService(), server)
-    server.add_insecure_port(server_config.get('host')+ ':' + str(server_config.get('port')))
+    server.add_insecure_port('[::]:' + str(server_config.get('port')))
+    print server_config.get('host')
     server.start()
     try:
         while True:
             time.sleep(_ONE_DAY_IN_SECONDS)
     except KeyboardInterrupt:
         server.stop(0)
-#
-# if __name__ == '__main__':
-#     logging.basicConfig()
-#     serve()
+
+if __name__ == '__main__':
+    logging.basicConfig()
+    serve()
