@@ -10,7 +10,6 @@ import fileIO.payload_pb2_grpc as payload_pb2_grpc
 import time
 from concurrent import futures
 
-
 ips = ['ip1','ip2','ip3']
 
 stat = [None]*len(ips)
@@ -22,6 +21,7 @@ for i, ip in enumerate(ips):
 
 #TODO: fix simple file service to read and write. right now just write
 #TODO: implement system file logging to understand where the file is (Hashing)
+
 class SimpleFileService(payload_pb2_grpc.RouteServiceServicer):
     def __init__(self):
         self.data = ""
@@ -52,6 +52,7 @@ def serve():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     payload_pb2_grpc.add_RouteServiceServicer_to_server(SimpleFileService(), server)
     server.add_insecure_port('[::]:'+ str(server_config.get('port')))
+
     server.start()
     try:
         while True:
