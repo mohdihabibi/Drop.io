@@ -1,12 +1,9 @@
 from concurrent import futures
-import os
-import sys
 import time
-import logging
 import grpc
-import payload_pb2
-import payload_pb2_grpc
-import redis
+import fileService_pb2
+import fileService_pb2_grpc
+from util.db import RedisDatabase
 
 import sys
 sys.path.append('../')
@@ -16,53 +13,101 @@ from config.config import server_config
 _ONE_DAY_IN_SECONDS = 60 * 60 * 24
 DEBUG = True
 
-class FileService(payload_pb2_grpc.RouteServiceServicer):
+class FileService(fileService_pb2_grpc.FileserviceServicer):
 
-    def openDB(self):
-        r = redis.Redis(
-            host='localhost',
-            port=6379)
-
-        return r
+    client = RedisDatabase()
+    replicationClient = RedisDatabase()
 
     def store_data(self, id, data):
-        r = self.openDB()
-        r.set(id, data)
         if DEBUG:
             print "Inside store data. Data stored with id : {} successfully".format(id)
+        return self.client.set(id, data)
+
+    def store_replicated_data(self, id, data):
+        self.replicationClient.set(id, data)
+        return True
 
     def get_data(self, id):
-        r = self.openDB()
-        data = r.get(id)
+        data = self.client.get(id)
         if DEBUG:
             print "Inside get data. Data is : {}".format(id)
         return data
 
     def is_data_available(self, id):
-        r = self.openDB()
-        if r.get(id):
+        if self.client.get(id):
             return True
         else:
             return False
 
-    def request(self, request, context):
-        if DEBUG:
-            print("Request recieved from client. Message is : {}".format(request))
-        if self.is_data_available(request.id):
-            data = self.get_data(request.id)
-            return payload_pb2.Route(payload = data)
+    def delete_data(self, id):
+        return self.client.delete(id)
+
+    def UploadFile(self, request_iterator, context):
+        data = request_iterator.data
+        self.store_data(request_iterator.filename, data)
+        return fileService_pb2.ack(
+            success=True, message="Data successfully stored!"
+        )
+
+    def DownloadFile(self, request, context):
+        filename = request.filename
+        if self.is_data_available(filename):
+            data = self.get_data(filename)
         else:
-            self.store_data(request.id, request.payload)
-            return payload_pb2.Route(
-                payload= "Stored successfully!!"
+            return "File is not available"
+        return fileService_pb2.FileData(
+            username="",filename=filename, data = data
+        )
+
+    #This function doesn't need to be implemented on slave server
+    def FileSearch(self, request, context):
+        pass
+
+    def ReplicateFile(self, request_iterator, context):
+        data = request_iterator.data
+        filename = request_iterator.filename
+        if self.store_replicated_data(filename, data):
+            return fileService_pb2.ack(
+                success=True, message="Data successfully replicated!"
+            )
+        else:
+            return fileService_pb2.ack(
+                success=False, message="Replication was unsuccesful!"
+            )
+
+    #This function doesn't need to be implemented on slave server
+    def FileList(self, request, context):
+        pass
+
+    def FileDelete(self, request, context):
+        filename = request.filename
+        if self.delete_data(filename):
+            return fileService_pb2.ack(
+                success=True, message="Data successfully deleted!"
+            )
+        else:
+            return fileService_pb2.ack(
+                success=False, message="Deletion was unsuccessful!"
+            )
+
+    def UpdateFile(self, request_iterator, context):
+        data = request_iterator.data
+        filename = request_iterator.filename
+        if self.store_data(filename, data):
+            return fileService_pb2.ack(
+                success=True, message="Data successfully updated!"
+            )
+        else:
+            return fileService_pb2.ack(
+                success=False, message="Couldn't update the instance!"
             )
 
 def serve():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
-    payload_pb2_grpc.add_RouteServiceServicer_to_server(FileService(), server)
+    fileService_pb2_grpc.add_FileserviceServicer_to_server(FileService(), server)
     server.add_insecure_port('[::]:' + str(server_config.get('port')))
-    print server_config.get('host')
     server.start()
+    print "Slave server is running ..."
     try:
         while True:
             time.sleep(_ONE_DAY_IN_SECONDS)
