@@ -54,6 +54,7 @@ class SimpleFileService(fileservice_grpc.FileserviceServicer):
         return data
 
     def is_data_available(self, id):
+        print "inside data is available"
         if self.client.conn.exists(id):
             return True
         else:
@@ -74,10 +75,13 @@ class SimpleFileService(fileservice_grpc.FileserviceServicer):
         print "inside download file"
         hashed_val = self.get_hash(request)
         if self.is_data_available(hashed_val):
+            print "inside if statement"
             ip = self.get_data(hashed_val)
             return self.list_of_stubs[ip].DownloadFile(request)
         else:
-            return "File is not available"
+            return fileservice.ack(
+                success=False, message="File is not available"
+            )
 
     #This function doesn't need to be implemented for slave server
     def FileSearch(self, request, context):
