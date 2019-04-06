@@ -8,8 +8,8 @@ class RedisDatabase(object):
     @property
     def conn(self):
         if not hasattr(self, '_conn'):
-            self.getConnection()
+            self.get_connection()
         return self._conn
 
-    def getConnection(self):
+    def get_connection(self):
         self._conn = redis.Redis(connection_pool=self.pool)

@@ -1,12 +1,15 @@
+from multiprocessing import Process
 import sys
 sys.path.append('../')
 
 import fileIO.server as server
 import heartbeat.heartbeat_server as hb_server
 
-import threading
+if __name__=='__main__':
+    p1 = Process(target=hb_server.serve())
+    p1.start()
+    p2 = Process(target=server.serve())
+    p2.start()
 
-t1 = threading.Thread(target=hb_server.serve())
-t2 = threading.Thread(target=server.serve())
-t1.start()
-t2.start()
+
+

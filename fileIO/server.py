@@ -15,32 +15,32 @@ DEBUG = True
 
 class FileService(fileService_pb2_grpc.FileserviceServicer):
 
-    client = RedisDatabase()
-    replicationClient = RedisDatabase()
+    client = RedisDatabase.RedisDatabase()
+    replicationClient = RedisDatabase.RedisDatabase()
 
     def store_data(self, id, data):
         if DEBUG:
             print "Inside store data. Data stored with id : {} successfully".format(id)
-        return self.client.set(id, data)
+        return self.client.conn.set(id, data)
 
     def store_replicated_data(self, id, data):
-        self.replicationClient.set(id, data)
+        self.replicationClient.conn.set(id, data)
         return True
 
     def get_data(self, id):
-        data = self.client.get(id)
+        data = self.client.conn.get(id)
         if DEBUG:
             print "Inside get data. Data is : {}".format(id)
         return data
 
     def is_data_available(self, id):
-        if self.client.get(id):
+        if self.client.conn.get(id):
             return True
         else:
             return False
 
     def delete_data(self, id):
-        return self.client.delete(id)
+        return self.client.conn.delete(id)
 
     def UploadFile(self, request_iterator, context):
         data = request_iterator.data
@@ -103,11 +103,11 @@ class FileService(fileService_pb2_grpc.FileserviceServicer):
             )
 
 def serve():
+    print "Slave server is running ..."
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     fileService_pb2_grpc.add_FileserviceServicer_to_server(FileService(), server)
     server.add_insecure_port('[::]:' + str(server_config.get('port')))
     server.start()
-    print "Slave server is running ..."
     try:
         while True:
             time.sleep(_ONE_DAY_IN_SECONDS)

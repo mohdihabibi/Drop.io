@@ -10,7 +10,7 @@ import os
 import sys
 sys.path.append('../')
 
-from config.config import server_config
+from config.config import heartbeat_config
 from util.utility import getMyIp
 
 _ONE_DAY_IN_SECONDS = 60 * 60 * 24
@@ -43,10 +43,11 @@ class Heartbeat(heartbeat_pb2_grpc.HearBeatServicer):
 
 
 def serve():
+    print "heartbeat server is running..."
     getMyIp()
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     heartbeat_pb2_grpc.add_HearBeatServicer_to_server(Heartbeat(), server)
-    server.add_insecure_port(server_config.get('host')+':'+str(server_config.get('port')))
+    server.add_insecure_port('[::]:'+str(heartbeat_config.get('port')))
     server.start()
     try:
         while True:
