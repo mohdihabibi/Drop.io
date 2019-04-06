@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='',
   syntax='proto3',
   serialized_options=None,
-  serialized_pb=_b('\n\x11\x66ileService.proto\"<\n\x08\x46ileData\x12\x10\n\x08username\x18\x01 \x01(\t\x12\x10\n\x08\x66ilename\x18\x02 \x01(\t\x12\x0c\n\x04\x64\x61ta\x18\x03 \x01(\x0c\"\'\n\x03\x61\x63k\x12\x0f\n\x07success\x18\x01 \x01(\x08\x12\x0f\n\x07message\x18\x02 \x01(\t\"\x1c\n\x08UserInfo\x12\x10\n\x08username\x18\x01 \x01(\t\".\n\x08\x46ileInfo\x12\x10\n\x08username\x18\x01 \x01(\t\x12\x10\n\x08\x66ilename\x18\x02 \x01(\t\"%\n\x10\x46ileListResponse\x12\x11\n\tFilenames\x18\x01 \x01(\t2\x83\x02\n\x0b\x46ileservice\x12\x1f\n\nUploadFile\x12\t.FileData\x1a\x04.ack(\x01\x12&\n\x0c\x44ownloadFile\x12\t.FileInfo\x1a\t.FileData0\x01\x12\x1d\n\nFileSearch\x12\t.FileInfo\x1a\x04.ack\x12\"\n\rReplicateFile\x12\t.FileData\x1a\x04.ack(\x01\x12(\n\x08\x46ileList\x12\t.UserInfo\x1a\x11.FileListResponse\x12\x1d\n\nFileDelete\x12\t.FileInfo\x1a\x04.ack\x12\x1f\n\nUpdateFile\x12\t.FileData\x1a\x04.ack(\x01\x62\x06proto3')
+  serialized_pb=_b('\n\x11\x66ileService.proto\"<\n\x08\x46ileData\x12\x10\n\x08username\x18\x01 \x01(\t\x12\x10\n\x08\x66ilename\x18\x02 \x01(\t\x12\x0c\n\x04\x64\x61ta\x18\x03 \x01(\x0c\"\'\n\x03\x61\x63k\x12\x0f\n\x07success\x18\x01 \x01(\x08\x12\x0f\n\x07message\x18\x02 \x01(\t\"\x1c\n\x08UserInfo\x12\x10\n\x08username\x18\x01 \x01(\t\".\n\x08\x46ileInfo\x12\x10\n\x08username\x18\x01 \x01(\t\x12\x10\n\x08\x66ilename\x18\x02 \x01(\t\"%\n\x10\x46ileListResponse\x12\x11\n\tFilenames\x18\x01 \x01(\t\".\n\x10HeartBeatRequest\x12\n\n\x02ip\x18\x01 \x01(\t\x12\x0e\n\x06leader\x18\x02 \x01(\x08\"\x9e\x02\n\x11HeartBeatResponse\x12\n\n\x02ip\x18\x01 \x01(\t\x12\x0c\n\x04live\x18\x02 \x01(\x08\x12\x11\n\tcpu_usage\x18\x03 \x01(\x02\x12\x12\n\ndisk_space\x18\x04 \x01(\x02\x12\x13\n\x0bnum_process\x18\x05 \x01(\x05\x12\x12\n\nnum_thread\x18\x06 \x01(\x05\x12\x0c\n\x04idle\x18\x07 \x01(\x02\x12\x0f\n\x07tot_mem\x18\x08 \x01(\x02\x12\x10\n\x08used_mem\x18\t \x01(\x02\x12\x19\n\x11\x64\x61ta_read_per_sec\x18\n \x01(\x02\x12\x1a\n\x12\x64\x61ta_write_per_sec\x18\x0b \x01(\x02\x12\x1c\n\x14\x64\x61ta_recieve_per_sec\x18\x0c \x01(\x02\x12\x19\n\x11\x64\x61ta_sent_per_sec\x18\r \x01(\x02\x32\xb9\x02\n\x0b\x46ileservice\x12\x1f\n\nUploadFile\x12\t.FileData\x1a\x04.ack(\x01\x12&\n\x0c\x44ownloadFile\x12\t.FileInfo\x1a\t.FileData0\x01\x12\x1d\n\nFileSearch\x12\t.FileInfo\x1a\x04.ack\x12\"\n\rReplicateFile\x12\t.FileData\x1a\x04.ack(\x01\x12(\n\x08\x46ileList\x12\t.UserInfo\x1a\x11.FileListResponse\x12\x1d\n\nFileDelete\x12\t.FileInfo\x1a\x04.ack\x12\x1f\n\nUpdateFile\x12\t.FileData\x1a\x04.ack(\x01\x12\x34\n\tgetStatus\x12\x11.HeartBeatRequest\x1a\x12.HeartBeatResponse\"\x00\x62\x06proto3')
 )
 
 
@@ -207,11 +207,166 @@ _FILELISTRESPONSE = _descriptor.Descriptor(
   serialized_end=239,
 )
 
+
+_HEARTBEATREQUEST = _descriptor.Descriptor(
+  name='HeartBeatRequest',
+  full_name='HeartBeatRequest',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='ip', full_name='HeartBeatRequest.ip', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='leader', full_name='HeartBeatRequest.leader', index=1,
+      number=2, type=8, cpp_type=7, label=1,
+      has_default_value=False, default_value=False,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=241,
+  serialized_end=287,
+)
+
+
+_HEARTBEATRESPONSE = _descriptor.Descriptor(
+  name='HeartBeatResponse',
+  full_name='HeartBeatResponse',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='ip', full_name='HeartBeatResponse.ip', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='live', full_name='HeartBeatResponse.live', index=1,
+      number=2, type=8, cpp_type=7, label=1,
+      has_default_value=False, default_value=False,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='cpu_usage', full_name='HeartBeatResponse.cpu_usage', index=2,
+      number=3, type=2, cpp_type=6, label=1,
+      has_default_value=False, default_value=float(0),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='disk_space', full_name='HeartBeatResponse.disk_space', index=3,
+      number=4, type=2, cpp_type=6, label=1,
+      has_default_value=False, default_value=float(0),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='num_process', full_name='HeartBeatResponse.num_process', index=4,
+      number=5, type=5, cpp_type=1, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='num_thread', full_name='HeartBeatResponse.num_thread', index=5,
+      number=6, type=5, cpp_type=1, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='idle', full_name='HeartBeatResponse.idle', index=6,
+      number=7, type=2, cpp_type=6, label=1,
+      has_default_value=False, default_value=float(0),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='tot_mem', full_name='HeartBeatResponse.tot_mem', index=7,
+      number=8, type=2, cpp_type=6, label=1,
+      has_default_value=False, default_value=float(0),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='used_mem', full_name='HeartBeatResponse.used_mem', index=8,
+      number=9, type=2, cpp_type=6, label=1,
+      has_default_value=False, default_value=float(0),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='data_read_per_sec', full_name='HeartBeatResponse.data_read_per_sec', index=9,
+      number=10, type=2, cpp_type=6, label=1,
+      has_default_value=False, default_value=float(0),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='data_write_per_sec', full_name='HeartBeatResponse.data_write_per_sec', index=10,
+      number=11, type=2, cpp_type=6, label=1,
+      has_default_value=False, default_value=float(0),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='data_recieve_per_sec', full_name='HeartBeatResponse.data_recieve_per_sec', index=11,
+      number=12, type=2, cpp_type=6, label=1,
+      has_default_value=False, default_value=float(0),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='data_sent_per_sec', full_name='HeartBeatResponse.data_sent_per_sec', index=12,
+      number=13, type=2, cpp_type=6, label=1,
+      has_default_value=False, default_value=float(0),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=290,
+  serialized_end=576,
+)
+
 DESCRIPTOR.message_types_by_name['FileData'] = _FILEDATA
 DESCRIPTOR.message_types_by_name['ack'] = _ACK
 DESCRIPTOR.message_types_by_name['UserInfo'] = _USERINFO
 DESCRIPTOR.message_types_by_name['FileInfo'] = _FILEINFO
 DESCRIPTOR.message_types_by_name['FileListResponse'] = _FILELISTRESPONSE
+DESCRIPTOR.message_types_by_name['HeartBeatRequest'] = _HEARTBEATREQUEST
+DESCRIPTOR.message_types_by_name['HeartBeatResponse'] = _HEARTBEATRESPONSE
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 FileData = _reflection.GeneratedProtocolMessageType('FileData', (_message.Message,), dict(
@@ -249,6 +404,20 @@ FileListResponse = _reflection.GeneratedProtocolMessageType('FileListResponse', 
   ))
 _sym_db.RegisterMessage(FileListResponse)
 
+HeartBeatRequest = _reflection.GeneratedProtocolMessageType('HeartBeatRequest', (_message.Message,), dict(
+  DESCRIPTOR = _HEARTBEATREQUEST,
+  __module__ = 'fileService_pb2'
+  # @@protoc_insertion_point(class_scope:HeartBeatRequest)
+  ))
+_sym_db.RegisterMessage(HeartBeatRequest)
+
+HeartBeatResponse = _reflection.GeneratedProtocolMessageType('HeartBeatResponse', (_message.Message,), dict(
+  DESCRIPTOR = _HEARTBEATRESPONSE,
+  __module__ = 'fileService_pb2'
+  # @@protoc_insertion_point(class_scope:HeartBeatResponse)
+  ))
+_sym_db.RegisterMessage(HeartBeatResponse)
+
 
 
 _FILESERVICE = _descriptor.ServiceDescriptor(
@@ -257,8 +426,8 @@ _FILESERVICE = _descriptor.ServiceDescriptor(
   file=DESCRIPTOR,
   index=0,
   serialized_options=None,
-  serialized_start=242,
-  serialized_end=501,
+  serialized_start=579,
+  serialized_end=892,
   methods=[
   _descriptor.MethodDescriptor(
     name='UploadFile',
@@ -321,6 +490,15 @@ _FILESERVICE = _descriptor.ServiceDescriptor(
     containing_service=None,
     input_type=_FILEDATA,
     output_type=_ACK,
+    serialized_options=None,
+  ),
+  _descriptor.MethodDescriptor(
+    name='getStatus',
+    full_name='Fileservice.getStatus',
+    index=7,
+    containing_service=None,
+    input_type=_HEARTBEATREQUEST,
+    output_type=_HEARTBEATRESPONSE,
     serialized_options=None,
   ),
 ])

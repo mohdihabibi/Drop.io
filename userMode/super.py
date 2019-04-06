@@ -1,7 +1,6 @@
 import sys
 sys.path.append('../')
 import fileIO.server as super_server
-import heartbeat.heartbeat_client as hb_client
 import threading
 from config.config import server_config
 import grpc
@@ -10,26 +9,32 @@ import fileIO.fileService_pb2_grpc as fileservice_grpc
 import time
 from concurrent import futures
 from util.db import RedisDatabase
+from time import sleep
 
 DEBUG = False
 
 #TODO: replace with IP addresses
 # ips = ['ip1','ip2','ip3']
-ips = ['localhost']
-stat = [None]*len(ips)
+# ips = ['localhost']
+# stat = [None]*len(ips)
 
 #TODO: fix simple file service to read and write. right now just write
 #TODO: implement system file logging to understand where the file is (Hashing)
 
 class SimpleFileService(fileservice_grpc.FileserviceServicer):
-    client = RedisDatabase.RedisDatabase()
-    list_of_stubs = {}
 
     def __init__(self):
+        self.client = RedisDatabase.RedisDatabase()
+        self.list_of_stubs = {}
+        self.ips = ['localhost']
+        self.stat = [None] * len(self.ips)
         self.make_list_of_stubs()
+        for i, ip in enumerate(self.ips):
+            t = threading.Thread(target=self.get_status_of_slaves, args=(ip, self.stat, i))
+            t.start()
 
     def make_list_of_stubs (self):
-        for ip in ips:
+        for ip in self.ips:
             channel = grpc.insecure_channel(ip + ':' + str(server_config.get('port')))
             stub = fileservice_grpc.FileserviceStub(channel)
             self.list_of_stubs[ip] = stub
@@ -115,17 +120,32 @@ class SimpleFileService(fileservice_grpc.FileserviceServicer):
     def get_least_busy_server(self):
         least = 0
         ip = ""
-        for s in stat:
+        for s in self.stat:
             if s.cpu_usage < least:
                 ip = s.ip
                 least = s.cpu_usage
         return ip
 
+    def get_status_of_slaves(self, target, status, index):
+        while True:
+            stat_resp = {}
+            try:
+                response = self.list_of_stubs[target].getStatus(fileservice.HeartBeatRequest(ip=target, leader=True))
+                stat_resp['live'] = True
+                stat_resp['cpu_usage'] = response.cpu_usage
+                stat_resp['mem_usage'] = response.used_mem
+            except:
+                stat_resp['live'] = False
+                stat_resp['cpu_usage'] = 0
+                stat_resp['mem_usage'] = 0
+            status[index] = stat_resp
+            sleep(2)
+
 def serve():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     fileservice_grpc.add_FileserviceServicer_to_server(SimpleFileService(), server)
     server.add_insecure_port('[::]:'+ str(server_config.get('port')))
-
+    print('starting super node.......')
     server.start()
     try:
         while True:
@@ -134,13 +154,5 @@ def serve():
         server.stop(0)
 
 if __name__ == '__main__':
-    # global ips
-    print "Super node started..."
-    server_thread = threading.Thread(target=serve())
-
-    server_thread.start()
-    for i, ip in enumerate(ips):
-        hb = hb_client.HeartBeatClient(ip, stat, i)
-        t = threading.Thread(target=hb.run())
-        t.start()
+    serve()
 

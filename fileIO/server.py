@@ -4,8 +4,13 @@ import grpc
 import fileService_pb2
 import fileService_pb2_grpc
 from util.db import RedisDatabase
+import psutil
+import os
 
 import sys
+
+from util.utility import getMyIp
+
 sys.path.append('../')
 
 from config.config import server_config
@@ -17,6 +22,8 @@ class FileService(fileService_pb2_grpc.FileserviceServicer):
 
     client = RedisDatabase.RedisDatabase()
     replicationClient = RedisDatabase.RedisDatabase()
+    def __init__(self):
+        self.my_ip = getMyIp()
 
     def store_data(self, id, data):
         if DEBUG:
@@ -101,6 +108,23 @@ class FileService(fileService_pb2_grpc.FileserviceServicer):
             return fileService_pb2.ack(
                 success=False, message="Couldn't update the instance!"
             )
+    def getStatus(self, request, context):
+        print("Request recieved from client. Client's IP address is: {}".format(request.ip))
+        process = psutil.Process(os.getpid())
+        return fileService_pb2.HeartBeatResponse(
+            ip=self.my_ip,
+            live=True,
+            cpu_usage= psutil.cpu_percent(),
+            disk_space=0.7,
+            num_process=11,
+            idle=0.9,
+            tot_mem=1.5,
+            used_mem=process.memory_percent() * 100,
+            data_read_per_sec=100.0,
+            data_write_per_sec=200.0,
+            data_recieve_per_sec=20.0,
+            data_sent_per_sec=10.0
+        )
 
 def serve():
     print "Slave server is running ..."

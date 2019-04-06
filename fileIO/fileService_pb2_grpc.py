@@ -49,6 +49,11 @@ class FileserviceStub(object):
         request_serializer=fileService__pb2.FileData.SerializeToString,
         response_deserializer=fileService__pb2.ack.FromString,
         )
+    self.getStatus = channel.unary_unary(
+        '/Fileservice/getStatus',
+        request_serializer=fileService__pb2.HeartBeatRequest.SerializeToString,
+        response_deserializer=fileService__pb2.HeartBeatResponse.FromString,
+        )
 
 
 class FileserviceServicer(object):
@@ -104,6 +109,13 @@ class FileserviceServicer(object):
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
+  def getStatus(self, request, context):
+    # missing associated documentation comment in .proto file
+    pass
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
 
 def add_FileserviceServicer_to_server(servicer, server):
   rpc_method_handlers = {
@@ -141,6 +153,11 @@ def add_FileserviceServicer_to_server(servicer, server):
           servicer.UpdateFile,
           request_deserializer=fileService__pb2.FileData.FromString,
           response_serializer=fileService__pb2.ack.SerializeToString,
+      ),
+      'getStatus': grpc.unary_unary_rpc_method_handler(
+          servicer.getStatus,
+          request_deserializer=fileService__pb2.HeartBeatRequest.FromString,
+          response_serializer=fileService__pb2.HeartBeatResponse.SerializeToString,
       ),
   }
   generic_handler = grpc.method_handlers_generic_handler(
