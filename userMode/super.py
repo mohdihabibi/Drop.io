@@ -30,12 +30,12 @@ class SimpleFileService(fileservice_grpc.FileserviceServicer):
         self.stat = [None] * len(self.ips)
         self.make_list_of_stubs()
         for i, ip in enumerate(self.ips):
-            t = threading.Thread(target=self.get_status_of_slaves, args=(ip, self.stat, i))
+            t = threading.Thread(target=self.get_status_of_slaves, args=(ip, i))
             t.start()
 
     def make_list_of_stubs (self):
         for ip in self.ips:
-            channel = grpc.insecure_channel(ip + ':' + str(server_config.get('port')))
+            channel = grpc.insecure_channel(ip + ':3001')
             stub = fileservice_grpc.FileserviceStub(channel)
             self.list_of_stubs[ip] = stub
 
@@ -66,10 +66,12 @@ class SimpleFileService(fileservice_grpc.FileserviceServicer):
         return str(request.filename)+str(request.username)
     def UploadFile(self, request_iterator, context):
         hashed_val = self.get_hash(request_iterator)
-        self.store_data(hashed_val, self.get_least_busy_server())
+        ip = self.get_least_busy_server()
+        self.store_data(hashed_val, ip)
         return self.list_of_stubs[ip].UploadFile(request_iterator)
 
     def DownloadFile(self, request, context):
+        print "inside download file"
         hashed_val = self.get_hash(request)
         if self.is_data_available(hashed_val):
             ip = self.get_data(hashed_val)
@@ -126,7 +128,7 @@ class SimpleFileService(fileservice_grpc.FileserviceServicer):
                 least = s.cpu_usage
         return ip
 
-    def get_status_of_slaves(self, target, status, index):
+    def get_status_of_slaves(self, target, index):
         while True:
             stat_resp = {}
             try:
@@ -138,13 +140,13 @@ class SimpleFileService(fileservice_grpc.FileserviceServicer):
                 stat_resp['live'] = False
                 stat_resp['cpu_usage'] = 0
                 stat_resp['mem_usage'] = 0
-            status[index] = stat_resp
+            self.stat[index] = stat_resp
             sleep(2)
 
 def serve():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     fileservice_grpc.add_FileserviceServicer_to_server(SimpleFileService(), server)
-    server.add_insecure_port('[::]:'+ str(server_config.get('port')))
+    server.add_insecure_port('[::]:3000')
     print('starting super node.......')
     server.start()
     try:

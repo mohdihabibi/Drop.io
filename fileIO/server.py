@@ -26,8 +26,8 @@ class FileService(fileService_pb2_grpc.FileserviceServicer):
         self.my_ip = getMyIp()
 
     def store_data(self, id, data):
-        if DEBUG:
-            print "Inside store data. Data stored with id : {} successfully".format(id)
+        # if DEBUG:
+        #     print "Inside store data. Data stored with id : {} successfully".format(id)
         return self.client.conn.set(id, data)
 
     def store_replicated_data(self, id, data):
@@ -36,8 +36,8 @@ class FileService(fileService_pb2_grpc.FileserviceServicer):
 
     def get_data(self, id):
         data = self.client.conn.get(id)
-        if DEBUG:
-            print "Inside get data. Data is : {}".format(id)
+        # if DEBUG:
+        #     print "Inside get data. Data is : {}".format(id)
         return data
 
     def is_data_available(self, id):
@@ -117,6 +117,7 @@ class FileService(fileService_pb2_grpc.FileserviceServicer):
             cpu_usage= psutil.cpu_percent(),
             disk_space=0.7,
             num_process=11,
+            num_thread=10,
             idle=0.9,
             tot_mem=1.5,
             used_mem=process.memory_percent() * 100,
@@ -127,10 +128,10 @@ class FileService(fileService_pb2_grpc.FileserviceServicer):
         )
 
 def serve():
-    print "Slave server is running ..."
+    print ("Slave server is running ...")
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     fileService_pb2_grpc.add_FileserviceServicer_to_server(FileService(), server)
-    server.add_insecure_port('[::]:' + str(server_config.get('port')))
+    server.add_insecure_port('[::]:3001')
     server.start()
     try:
         while True:
