@@ -19,10 +19,100 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='',
   syntax='proto3',
   serialized_options=None,
-  serialized_pb=_b('\n\x11\x66ileService.proto\"<\n\x08\x46ileData\x12\x10\n\x08username\x18\x01 \x01(\t\x12\x10\n\x08\x66ilename\x18\x02 \x01(\t\x12\x0c\n\x04\x64\x61ta\x18\x03 \x01(\x0c\"\'\n\x03\x61\x63k\x12\x0f\n\x07success\x18\x01 \x01(\x08\x12\x0f\n\x07message\x18\x02 \x01(\t\"\x1c\n\x08UserInfo\x12\x10\n\x08username\x18\x01 \x01(\t\".\n\x08\x46ileInfo\x12\x10\n\x08username\x18\x01 \x01(\t\x12\x10\n\x08\x66ilename\x18\x02 \x01(\t\"%\n\x10\x46ileListResponse\x12\x11\n\tFilenames\x18\x01 \x01(\t\".\n\x10HeartBeatRequest\x12\n\n\x02ip\x18\x01 \x01(\t\x12\x0e\n\x06leader\x18\x02 \x01(\x08\"\x9e\x02\n\x11HeartBeatResponse\x12\n\n\x02ip\x18\x01 \x01(\t\x12\x0c\n\x04live\x18\x02 \x01(\x08\x12\x11\n\tcpu_usage\x18\x03 \x01(\x02\x12\x12\n\ndisk_space\x18\x04 \x01(\x02\x12\x13\n\x0bnum_process\x18\x05 \x01(\x05\x12\x12\n\nnum_thread\x18\x06 \x01(\x05\x12\x0c\n\x04idle\x18\x07 \x01(\x02\x12\x0f\n\x07tot_mem\x18\x08 \x01(\x02\x12\x10\n\x08used_mem\x18\t \x01(\x02\x12\x19\n\x11\x64\x61ta_read_per_sec\x18\n \x01(\x02\x12\x1a\n\x12\x64\x61ta_write_per_sec\x18\x0b \x01(\x02\x12\x1c\n\x14\x64\x61ta_recieve_per_sec\x18\x0c \x01(\x02\x12\x19\n\x11\x64\x61ta_sent_per_sec\x18\r \x01(\x02\x32\xb9\x02\n\x0b\x46ileservice\x12\x1f\n\nUploadFile\x12\t.FileData\x1a\x04.ack(\x01\x12&\n\x0c\x44ownloadFile\x12\t.FileInfo\x1a\t.FileData0\x01\x12\x1d\n\nFileSearch\x12\t.FileInfo\x1a\x04.ack\x12\"\n\rReplicateFile\x12\t.FileData\x1a\x04.ack(\x01\x12(\n\x08\x46ileList\x12\t.UserInfo\x1a\x11.FileListResponse\x12\x1d\n\nFileDelete\x12\t.FileInfo\x1a\x04.ack\x12\x1f\n\nUpdateFile\x12\t.FileData\x1a\x04.ack(\x01\x12\x34\n\tgetStatus\x12\x11.HeartBeatRequest\x1a\x12.HeartBeatResponse\"\x00\x62\x06proto3')
+  serialized_pb=_b('\n\x11\x66ileService.proto\"<\n\x0b\x43lusterInfo\x12\n\n\x02ip\x18\x01 \x01(\t\x12\x0c\n\x04port\x18\x02 \x01(\t\x12\x13\n\x0b\x63lusterName\x18\x03 \x01(\t\"G\n\x0c\x43lusterStats\x12\x11\n\tcpu_usage\x18\x01 \x01(\t\x12\x12\n\ndisk_space\x18\x02 \x01(\t\x12\x10\n\x08used_mem\x18\x03 \x01(\t\"<\n\x08\x46ileData\x12\x10\n\x08username\x18\x01 \x01(\t\x12\x10\n\x08\x66ilename\x18\x02 \x01(\t\x12\x0c\n\x04\x64\x61ta\x18\x03 \x01(\x0c\"\'\n\x03\x61\x63k\x12\x0f\n\x07success\x18\x01 \x01(\x08\x12\x0f\n\x07message\x18\x02 \x01(\t\"\x1c\n\x08UserInfo\x12\x10\n\x08username\x18\x01 \x01(\t\".\n\x08\x46ileInfo\x12\x10\n\x08username\x18\x01 \x01(\t\x12\x10\n\x08\x66ilename\x18\x02 \x01(\t\"%\n\x10\x46ileListResponse\x12\x11\n\tFilenames\x18\x01 \x01(\t\".\n\x10HeartBeatRequest\x12\n\n\x02ip\x18\x01 \x01(\t\x12\x0e\n\x06leader\x18\x02 \x01(\x08\"\x9e\x02\n\x11HeartBeatResponse\x12\n\n\x02ip\x18\x01 \x01(\t\x12\x0c\n\x04live\x18\x02 \x01(\x08\x12\x11\n\tcpu_usage\x18\x03 \x01(\x02\x12\x12\n\ndisk_space\x18\x04 \x01(\x02\x12\x13\n\x0bnum_process\x18\x05 \x01(\x05\x12\x12\n\nnum_thread\x18\x06 \x01(\x05\x12\x0c\n\x04idle\x18\x07 \x01(\x02\x12\x0f\n\x07tot_mem\x18\x08 \x01(\x02\x12\x10\n\x08used_mem\x18\t \x01(\x02\x12\x19\n\x11\x64\x61ta_read_per_sec\x18\n \x01(\x02\x12\x1a\n\x12\x64\x61ta_write_per_sec\x18\x0b \x01(\x02\x12\x1c\n\x14\x64\x61ta_recieve_per_sec\x18\x0c \x01(\x02\x12\x19\n\x11\x64\x61ta_sent_per_sec\x18\r \x01(\x02\"\x07\n\x05\x45mpty2\x88\x03\n\x0b\x46ileservice\x12\x1f\n\nUploadFile\x12\t.FileData\x1a\x04.ack(\x01\x12&\n\x0c\x44ownloadFile\x12\t.FileInfo\x1a\t.FileData0\x01\x12\x1d\n\nFileSearch\x12\t.FileInfo\x1a\x04.ack\x12\"\n\rReplicateFile\x12\t.FileData\x1a\x04.ack(\x01\x12(\n\x08\x46ileList\x12\t.UserInfo\x1a\x11.FileListResponse\x12\x1d\n\nFileDelete\x12\t.FileInfo\x1a\x04.ack\x12\x1f\n\nUpdateFile\x12\t.FileData\x1a\x04.ack(\x01\x12(\n\x0fgetClusterStats\x12\x06.Empty\x1a\r.ClusterStats\x12#\n\rgetLeaderInfo\x12\x0c.ClusterInfo\x1a\x04.ack\x12\x34\n\tgetStatus\x12\x11.HeartBeatRequest\x1a\x12.HeartBeatResponse\"\x00\x62\x06proto3')
 )
 
 
+
+
+_CLUSTERINFO = _descriptor.Descriptor(
+  name='ClusterInfo',
+  full_name='ClusterInfo',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='ip', full_name='ClusterInfo.ip', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='port', full_name='ClusterInfo.port', index=1,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='clusterName', full_name='ClusterInfo.clusterName', index=2,
+      number=3, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=21,
+  serialized_end=81,
+)
+
+
+_CLUSTERSTATS = _descriptor.Descriptor(
+  name='ClusterStats',
+  full_name='ClusterStats',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='cpu_usage', full_name='ClusterStats.cpu_usage', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='disk_space', full_name='ClusterStats.disk_space', index=1,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='used_mem', full_name='ClusterStats.used_mem', index=2,
+      number=3, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=83,
+  serialized_end=154,
+)
 
 
 _FILEDATA = _descriptor.Descriptor(
@@ -65,8 +155,8 @@ _FILEDATA = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=21,
-  serialized_end=81,
+  serialized_start=156,
+  serialized_end=216,
 )
 
 
@@ -103,8 +193,8 @@ _ACK = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=83,
-  serialized_end=122,
+  serialized_start=218,
+  serialized_end=257,
 )
 
 
@@ -134,8 +224,8 @@ _USERINFO = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=124,
-  serialized_end=152,
+  serialized_start=259,
+  serialized_end=287,
 )
 
 
@@ -172,8 +262,8 @@ _FILEINFO = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=154,
-  serialized_end=200,
+  serialized_start=289,
+  serialized_end=335,
 )
 
 
@@ -203,8 +293,8 @@ _FILELISTRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=202,
-  serialized_end=239,
+  serialized_start=337,
+  serialized_end=374,
 )
 
 
@@ -241,8 +331,8 @@ _HEARTBEATREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=241,
-  serialized_end=287,
+  serialized_start=376,
+  serialized_end=422,
 )
 
 
@@ -356,10 +446,36 @@ _HEARTBEATRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=290,
-  serialized_end=576,
+  serialized_start=425,
+  serialized_end=711,
 )
 
+
+_EMPTY = _descriptor.Descriptor(
+  name='Empty',
+  full_name='Empty',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=713,
+  serialized_end=720,
+)
+
+DESCRIPTOR.message_types_by_name['ClusterInfo'] = _CLUSTERINFO
+DESCRIPTOR.message_types_by_name['ClusterStats'] = _CLUSTERSTATS
 DESCRIPTOR.message_types_by_name['FileData'] = _FILEDATA
 DESCRIPTOR.message_types_by_name['ack'] = _ACK
 DESCRIPTOR.message_types_by_name['UserInfo'] = _USERINFO
@@ -367,7 +483,22 @@ DESCRIPTOR.message_types_by_name['FileInfo'] = _FILEINFO
 DESCRIPTOR.message_types_by_name['FileListResponse'] = _FILELISTRESPONSE
 DESCRIPTOR.message_types_by_name['HeartBeatRequest'] = _HEARTBEATREQUEST
 DESCRIPTOR.message_types_by_name['HeartBeatResponse'] = _HEARTBEATRESPONSE
+DESCRIPTOR.message_types_by_name['Empty'] = _EMPTY
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
+
+ClusterInfo = _reflection.GeneratedProtocolMessageType('ClusterInfo', (_message.Message,), dict(
+  DESCRIPTOR = _CLUSTERINFO,
+  __module__ = 'fileService_pb2'
+  # @@protoc_insertion_point(class_scope:ClusterInfo)
+  ))
+_sym_db.RegisterMessage(ClusterInfo)
+
+ClusterStats = _reflection.GeneratedProtocolMessageType('ClusterStats', (_message.Message,), dict(
+  DESCRIPTOR = _CLUSTERSTATS,
+  __module__ = 'fileService_pb2'
+  # @@protoc_insertion_point(class_scope:ClusterStats)
+  ))
+_sym_db.RegisterMessage(ClusterStats)
 
 FileData = _reflection.GeneratedProtocolMessageType('FileData', (_message.Message,), dict(
   DESCRIPTOR = _FILEDATA,
@@ -418,6 +549,13 @@ HeartBeatResponse = _reflection.GeneratedProtocolMessageType('HeartBeatResponse'
   ))
 _sym_db.RegisterMessage(HeartBeatResponse)
 
+Empty = _reflection.GeneratedProtocolMessageType('Empty', (_message.Message,), dict(
+  DESCRIPTOR = _EMPTY,
+  __module__ = 'fileService_pb2'
+  # @@protoc_insertion_point(class_scope:Empty)
+  ))
+_sym_db.RegisterMessage(Empty)
+
 
 
 _FILESERVICE = _descriptor.ServiceDescriptor(
@@ -426,8 +564,8 @@ _FILESERVICE = _descriptor.ServiceDescriptor(
   file=DESCRIPTOR,
   index=0,
   serialized_options=None,
-  serialized_start=579,
-  serialized_end=892,
+  serialized_start=723,
+  serialized_end=1115,
   methods=[
   _descriptor.MethodDescriptor(
     name='UploadFile',
@@ -493,9 +631,27 @@ _FILESERVICE = _descriptor.ServiceDescriptor(
     serialized_options=None,
   ),
   _descriptor.MethodDescriptor(
+    name='getClusterStats',
+    full_name='Fileservice.getClusterStats',
+    index=7,
+    containing_service=None,
+    input_type=_EMPTY,
+    output_type=_CLUSTERSTATS,
+    serialized_options=None,
+  ),
+  _descriptor.MethodDescriptor(
+    name='getLeaderInfo',
+    full_name='Fileservice.getLeaderInfo',
+    index=8,
+    containing_service=None,
+    input_type=_CLUSTERINFO,
+    output_type=_ACK,
+    serialized_options=None,
+  ),
+  _descriptor.MethodDescriptor(
     name='getStatus',
     full_name='Fileservice.getStatus',
-    index=7,
+    index=9,
     containing_service=None,
     input_type=_HEARTBEATREQUEST,
     output_type=_HEARTBEATRESPONSE,

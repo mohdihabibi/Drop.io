@@ -6,10 +6,11 @@ import fileService_pb2_grpc
 from util.db import RedisDatabase
 import psutil
 import os
-
+from userMode.master import leader
 import sys
-
-from util.utility import getMyIp
+from config.config import my_ip
+from util.leader_exception import LeaderException
+from userMode.change_role import change_role
 
 sys.path.append('../')
 
@@ -23,7 +24,7 @@ class FileService(fileService_pb2_grpc.FileserviceServicer):
     client = RedisDatabase.RedisDatabase()
     replicationClient = RedisDatabase.RedisDatabase()
     def __init__(self):
-        self.my_ip = getMyIp()
+        self.my_ip = my_ip
 
     def store_data(self, id, data):
         if DEBUG:
@@ -173,10 +174,11 @@ def serve():
     server.start()
     try:
         while True:
+            if leader == my_ip:
+                raise LeaderException
             time.sleep(_ONE_DAY_IN_SECONDS)
     except KeyboardInterrupt:
         server.stop(0)
-#
-# if __name__ == '__main__':
-#     logging.basicConfig()
-#     serve()
+    except LeaderException:
+        print "I AM THE NEW LEADER!"
+        change_role()

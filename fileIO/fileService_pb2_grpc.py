@@ -49,6 +49,16 @@ class FileserviceStub(object):
         request_serializer=fileService__pb2.FileData.SerializeToString,
         response_deserializer=fileService__pb2.ack.FromString,
         )
+    self.getClusterStats = channel.unary_unary(
+        '/Fileservice/getClusterStats',
+        request_serializer=fileService__pb2.Empty.SerializeToString,
+        response_deserializer=fileService__pb2.ClusterStats.FromString,
+        )
+    self.getLeaderInfo = channel.unary_unary(
+        '/Fileservice/getLeaderInfo',
+        request_serializer=fileService__pb2.ClusterInfo.SerializeToString,
+        response_deserializer=fileService__pb2.ack.FromString,
+        )
     self.getStatus = channel.unary_unary(
         '/Fileservice/getStatus',
         request_serializer=fileService__pb2.HeartBeatRequest.SerializeToString,
@@ -109,6 +119,20 @@ class FileserviceServicer(object):
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
+  def getClusterStats(self, request, context):
+    # missing associated documentation comment in .proto file
+    pass
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
+  def getLeaderInfo(self, request, context):
+    # missing associated documentation comment in .proto file
+    pass
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
   def getStatus(self, request, context):
     # missing associated documentation comment in .proto file
     pass
@@ -152,6 +176,16 @@ def add_FileserviceServicer_to_server(servicer, server):
       'UpdateFile': grpc.stream_unary_rpc_method_handler(
           servicer.UpdateFile,
           request_deserializer=fileService__pb2.FileData.FromString,
+          response_serializer=fileService__pb2.ack.SerializeToString,
+      ),
+      'getClusterStats': grpc.unary_unary_rpc_method_handler(
+          servicer.getClusterStats,
+          request_deserializer=fileService__pb2.Empty.FromString,
+          response_serializer=fileService__pb2.ClusterStats.SerializeToString,
+      ),
+      'getLeaderInfo': grpc.unary_unary_rpc_method_handler(
+          servicer.getLeaderInfo,
+          request_deserializer=fileService__pb2.ClusterInfo.FromString,
           response_serializer=fileService__pb2.ack.SerializeToString,
       ),
       'getStatus': grpc.unary_unary_rpc_method_handler(
