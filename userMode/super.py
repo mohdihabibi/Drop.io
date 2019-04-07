@@ -10,22 +10,16 @@ import time
 from concurrent import futures
 from util.db import RedisDatabase
 from time import sleep
+import io
 
 DEBUG = False
-
-#TODO: replace with IP addresses
-# ips = ['ip1','ip2','ip3']
-# ips = ['localhost']
-# stat = [None]*len(ips)
-
-#TODO: fix simple file service to read and write. right now just write
-#TODO: implement system file logging to understand where the file is (Hashing)
 
 class SimpleFileService(fileservice_grpc.FileserviceServicer):
 
     def __init__(self):
         self.client = RedisDatabase.RedisDatabase()
         self.list_of_stubs = {}
+        #TODO: replace with a list of real IPs
         self.ips = ['localhost']
         self.stat = [None] * len(self.ips)
         self.make_list_of_stubs()
@@ -55,32 +49,66 @@ class SimpleFileService(fileservice_grpc.FileserviceServicer):
 
     def is_data_available(self, id):
         print "inside data is available"
-        if self.client.conn.exists(id):
-            return True
-        else:
-            return False
+        try:
+            if self.client.conn.exists(id):
+                print "here"
+                return True
+            else:
+                print "there"
+                return False
+        except:
+            print "error"
 
     def delete_data(self, id):
         return self.client.conn.delete(id)
 
-    def get_hash(self,request):
-        return str(request.filename)+str(request.username)
+    def get_hash(self,filename, username):
+        return str(filename)+str(username)
+
+    def callUpload(self,iterator,ip):
+        try:
+            resp = self.list_of_stubs[ip].UploadFile(iterator)
+            print resp
+        except:
+            print "couldn't send the data"
+
+    def gen_stream(self,list_of_chunks):
+        for chunk in list_of_chunks:
+            yield chunk
+
     def UploadFile(self, request_iterator, context):
-        hashed_val = self.get_hash(request_iterator)
         ip = self.get_least_busy_server()
-        self.store_data(hashed_val, ip)
-        return self.list_of_stubs[ip].UploadFile(request_iterator)
+        with open('temp.txt', "w") as f:
+            for data in request_iterator:
+                f.write(data.data)
+        with open('temp.txt', "rb") as f:
+            seq_list = []
+            for seq in iter(lambda: f.read(1024 * 1024), b""):
+                #TODO: get file name and username from uploaded data
+                    seq_list.append(fileservice.FileData(username='mohdi', filename='file', data=seq))
+
+            resp = self.callUpload(self.gen_stream(seq_list), 'localhost')
+        # print("printing file name : {}",data.filename)
+        hashed_val = self.get_hash(data.filename, data.username)
+        print hashed_val
+        try:
+            #TODO: change it to IP
+            self.store_data(hashed_val, 'localhost')
+        except:
+            print "couldn't store in database"
+        return fileservice.ack(success=True, message="File is stored!")
 
     def DownloadFile(self, request, context):
         print "inside download file"
-        hashed_val = self.get_hash(request)
+        hashed_val = self.get_hash(request.filename, request.username)
+        print hashed_val
         if self.is_data_available(hashed_val):
             print "inside if statement"
             ip = self.get_data(hashed_val)
             return self.list_of_stubs[ip].DownloadFile(request)
         else:
-            return fileservice.ack(
-                success=False, message="File is not available"
+            return fileservice.FileData(
+                username='', filename='', data=''
             )
 
     #This function doesn't need to be implemented for slave server
@@ -126,8 +154,9 @@ class SimpleFileService(fileservice_grpc.FileserviceServicer):
     def get_least_busy_server(self):
         least = 0
         ip = ""
+        print self.stat
         for s in self.stat:
-            if s.cpu_usage < least:
+            if s['cpu_usage'] < least:
                 ip = s.ip
                 least = s.cpu_usage
         return ip

@@ -50,21 +50,53 @@ class FileService(fileService_pb2_grpc.FileserviceServicer):
         return self.client.conn.delete(id)
 
     def UploadFile(self, request_iterator, context):
-        data = request_iterator.data
-        self.store_data(request_iterator.filename, data)
-        return fileService_pb2.ack(
-            success=True, message="Data successfully stored!"
-        )
+        #TODO: replace it with in disk and memory database
+        print "inside upload file slave server"
+        for data in request_iterator:
+            print data
+        print data.filename
+        try:
+            self.store_data(data.filename, data.data)
+            return fileService_pb2.ack(
+                success=True, message="Data successfully stored!"
+            )
+        except:
+            print "couldn't store data"
+            return fileService_pb2.ack(
+                success=False, message="Data wasn't stored!"
+            )
+
+
+    def callUpload(self,iterator,ip):
+        self.list_of_stubs[ip].UploadFile(iterator)
+
+    def gen_stream(self,list_of_chunks):
+        for chunk in list_of_chunks:
+            yield chunk
+
+    def strBin(self, s_str):
+        binary = []
+        for s in s_str:
+            if s == ' ':
+                binary.append('00100000')
+            else:
+                binary.append(bin(ord(s)))
+        return binary
 
     def DownloadFile(self, request, context):
         filename = request.filename
         if self.is_data_available(filename):
-            data = self.get_data(filename)
-        else:
-            return "File is not available"
-        return fileService_pb2.FileData(
-            username="",filename=filename, data = data
-        )
+            payload = self.get_data(filename)
+            # TODO: replace the file reading piece with binary operation
+            # binary = self.strBin(payload)
+            # for data in binary:
+            #     yield fileService_pb2.FileData(username=request.filename, filename=request.username, data=data)
+
+            with open('file.txt', 'w') as f:
+                f.write(payload)
+            with open('file.txt', "rb") as f:
+                for data in iter(lambda: f.read(1024 * 1024), b""):
+                    yield fileService_pb2.FileData(username=request.filename, filename=request.username, data=data)
 
     #This function doesn't need to be implemented on slave server
     def FileSearch(self, request, context):
