@@ -26,8 +26,8 @@ class FileService(fileService_pb2_grpc.FileserviceServicer):
         self.my_ip = getMyIp()
 
     def store_data(self, id, data):
-        # if DEBUG:
-        #     print "Inside store data. Data stored with id : {} successfully".format(id)
+        if DEBUG:
+            print "Inside store data. Data stored with id : {} successfully".format(id)
         return self.client.conn.set(id, data)
 
     def store_replicated_data(self, id, data):
@@ -36,8 +36,8 @@ class FileService(fileService_pb2_grpc.FileserviceServicer):
 
     def get_data(self, id):
         data = self.client.conn.get(id)
-        # if DEBUG:
-        #     print "Inside get data. Data is : {}".format(id)
+        if DEBUG:
+            print "Inside get data. Data is : {}".format(id)
         return data
 
     def is_data_available(self, id):
@@ -51,7 +51,8 @@ class FileService(fileService_pb2_grpc.FileserviceServicer):
 
     def UploadFile(self, request_iterator, context):
         #TODO: replace it with in disk and memory database
-        print "inside upload file slave server"
+        if DEBUG:
+            print "inside upload file slave server"
         for data in request_iterator:
             print data
         print data.filename
@@ -66,9 +67,12 @@ class FileService(fileService_pb2_grpc.FileserviceServicer):
                 success=False, message="Data wasn't stored!"
             )
 
-
     def callUpload(self,iterator,ip):
-        self.list_of_stubs[ip].UploadFile(iterator)
+        try:
+            self.list_of_stubs[ip].UploadFile(iterator)
+        except:
+            if DEBUG:
+                print "Couldn't send back chunks"
 
     def gen_stream(self,list_of_chunks):
         for chunk in list_of_chunks:
@@ -84,6 +88,8 @@ class FileService(fileService_pb2_grpc.FileserviceServicer):
         return binary
 
     def DownloadFile(self, request, context):
+        if DEBUG:
+            print "inside download file!"
         filename = request.filename
         if self.is_data_available(filename):
             payload = self.get_data(filename)

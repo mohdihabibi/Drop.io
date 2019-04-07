@@ -70,7 +70,8 @@ class SimpleFileService(fileservice_grpc.FileserviceServicer):
             resp = self.list_of_stubs[ip].UploadFile(iterator)
             print resp
         except:
-            print "couldn't send the data"
+            if DEBUG:
+                print "couldn't send the data"
 
     def gen_stream(self,list_of_chunks):
         for chunk in list_of_chunks:
@@ -86,11 +87,9 @@ class SimpleFileService(fileservice_grpc.FileserviceServicer):
             for seq in iter(lambda: f.read(1024 * 1024), b""):
                 #TODO: get file name and username from uploaded data
                     seq_list.append(fileservice.FileData(username='mohdi', filename='file', data=seq))
-
-            resp = self.callUpload(self.gen_stream(seq_list), 'localhost')
-        # print("printing file name : {}",data.filename)
+            #TODO: replace localhost with IP
+            self.callUpload(self.gen_stream(seq_list), 'localhost')
         hashed_val = self.get_hash(data.filename, data.username)
-        print hashed_val
         try:
             #TODO: change it to IP
             self.store_data(hashed_val, 'localhost')
@@ -156,6 +155,8 @@ class SimpleFileService(fileservice_grpc.FileserviceServicer):
         ip = ""
         print self.stat
         for s in self.stat:
+            if not s['live']:
+                continue
             if s['cpu_usage'] < least:
                 ip = s.ip
                 least = s.cpu_usage
