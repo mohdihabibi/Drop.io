@@ -8,7 +8,7 @@ import fileIO.fileService_pb2 as fileservice
 import fileIO.fileService_pb2_grpc as fileservice_grpc
 import time
 from concurrent import futures
-from util.db import RedisDatabase
+from storage.database import Database
 from time import sleep
 import io
 
@@ -17,7 +17,7 @@ DEBUG = False
 class SimpleFileService(fileservice_grpc.FileserviceServicer):
 
     def __init__(self):
-        self.client = RedisDatabase.RedisDatabase()
+        self.client = Database()
         self.list_of_stubs = {}
         #TODO: replace with a list of real IPs
         self.ips = ['localhost']
@@ -32,35 +32,6 @@ class SimpleFileService(fileservice_grpc.FileserviceServicer):
             channel = grpc.insecure_channel(ip + ':3001')
             stub = fileservice_grpc.FileserviceStub(channel)
             self.list_of_stubs[ip] = stub
-
-    def store_data(self, id, data):
-        if DEBUG:
-            print "Inside store data. Data stored with id : {} successfully".format(id)
-        return self.client.conn.set(id, data)
-
-    def store_replicated_data(self, id, data):
-        pass
-
-    def get_data(self, id):
-        data = self.client.conn.get(id)
-        if DEBUG:
-            print "Inside get data. Data is : {}".format(id)
-        return data
-
-    def is_data_available(self, id):
-        print "inside data is available"
-        try:
-            if self.client.conn.exists(id):
-                print "here"
-                return True
-            else:
-                print "there"
-                return False
-        except:
-            print "error"
-
-    def delete_data(self, id):
-        return self.client.conn.delete(id)
 
     def get_hash(self,filename, username):
         return str(filename)+str(username)
@@ -93,7 +64,7 @@ class SimpleFileService(fileservice_grpc.FileserviceServicer):
         print hashed_val
         try:
             #TODO: change it to IP
-            self.store_data(hashed_val, 'localhost')
+            self.client.store_data(hashed_val, 'localhost')
         except:
             print "couldn't store in database"
         return fileservice.ack(success=True, message="File is stored!")
@@ -102,9 +73,9 @@ class SimpleFileService(fileservice_grpc.FileserviceServicer):
         print "inside download file"
         hashed_val = self.get_hash(request.filename, request.username)
         print hashed_val
-        if self.is_data_available(hashed_val):
+        if self.client.is_data_available(hashed_val):
             print "inside if statement"
-            ip = self.get_data(hashed_val)
+            ip = self.client.get_data(hashed_val)
             return self.list_of_stubs[ip].DownloadFile(request)
         else:
             return fileservice.FileData(
@@ -114,7 +85,7 @@ class SimpleFileService(fileservice_grpc.FileserviceServicer):
     #This function doesn't need to be implemented for slave server
     def FileSearch(self, request, context):
         hashed_val = self.get_hash(request)
-        if self.is_data_available(hashed_val):
+        if self.client.is_data_available(hashed_val):
             return fileservice.ack(
                 success=True, message="File is available!"
             )
@@ -133,8 +104,8 @@ class SimpleFileService(fileservice_grpc.FileserviceServicer):
 
     def FileDelete(self, request, context):
         hashed_val = self.get_hash(request)
-        if self.is_data_available(hashed_val):
-            ip = self.get_data(hashed_val)
+        if self.client.is_data_available(hashed_val):
+            ip = self.client.get_data(hashed_val)
             return self.list_of_stubs[ip].FileDelete(request)
         else:
             return fileservice.ack(
@@ -143,8 +114,8 @@ class SimpleFileService(fileservice_grpc.FileserviceServicer):
 
     def UpdateFile(self, request_iterator, context):
         hashed_val = self.get_hash(request_iterator)
-        if self.is_data_available(hashed_val):
-            ip = self.get_data(hashed_val)
+        if self.client.is_data_available(hashed_val):
+            ip = self.client.get_data(hashed_val)
             return self.list_of_stubs[ip].FileUpload(request_iterator)
         else:
             return fileservice.ack(

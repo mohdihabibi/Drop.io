@@ -22,14 +22,14 @@ def gen_stream(list_of_chunks):
 if __name__ == '__main__':
 
   stub = fileService_pb2_grpc.FileserviceStub(channel)
-  # with open('test.txt', "rb") as f:
-  #   seq_list = []
-  #   for seq in iter(lambda: f.read(1024 * 1024), b""):
-  #     seq_list.append(fileService_pb2.FileData(username='mohdi',filename='file', data=seq))
-  #   callUpload(gen_stream(seq_list))
+  with open('test.txt', "rb") as f:
+    seq_list = []
+    for seq in iter(lambda: f.read(1024 * 1024), b""):
+       seq_list.append(fileService_pb2.FileData(username='mohdi',filename='file', data=seq))
+    callUpload(gen_stream(seq_list))
 
-  response = stub.DownloadFile(fileService_pb2.FileInfo(username='mohdi',filename='file'))
-  for data in response:
-    print("Status from server received. response is : {}".format(data))
+  #response = stub.DownloadFile(fileService_pb2.FileInfo(username='mohdi',filename='file'))
+  #for data in response:
+  #  print("Status from server received. response is : {}".format(data))
 
 
