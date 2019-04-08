@@ -7,7 +7,7 @@ from config.config import my_ip, list_of_ips
 from util.utility import clear_ports
 
 from super import serve as super_server
-import fileIO.server as slave_server
+from server import serve as slave_server
 
 from raft.raft import  TestObj
 leader=""
@@ -46,16 +46,14 @@ def run():
                 print('Current Log Size:', o._getRaftLogSize())
 
 if __name__ == '__main__':
-    othernodes = list_of_ips
-    myIp = my_ip
     clear_ports()
     t = threading.Thread(target=run)
     t.start()
     while leader == "":
         pass
 
-    if leader == myIp:
+    if leader == my_ip:
         sleep(2)
         super_server()
     else:
-        slave_server.serve()
+        slave_server()

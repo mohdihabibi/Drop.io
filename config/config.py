@@ -5,6 +5,6 @@ server_config = {
 heartbeat_config = {
     'port' : 2000
 }
-list_of_ips = ['localhost']
-my_ip = ['localhost']
+list_of_ips = 'localhost'
+my_ip = 'localhost'
 leader_ip = 'localhost'
