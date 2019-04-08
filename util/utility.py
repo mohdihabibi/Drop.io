@@ -9,5 +9,5 @@ def getMyIp():
     my_ips = ip_list.split()
     myIp = ','.join(my_ips)
 
-def clear_ports():
-    subprocess.call(["sh", "kill.sh"])
+def clear_ports(port):
+    subprocess.call(["sh", "kill.sh", port])

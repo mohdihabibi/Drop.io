@@ -13,8 +13,10 @@ os.environ['leader'] = ''
 
 def change_role():
     if os.environ['leader'] == my_ip:
+        clear_ports('3000')
         super_server()
     else:
+        clear_ports('3001')
         slave_server()
 
 def onAdd(res, err, cnt):
@@ -48,7 +50,7 @@ def run():
                 # print('Current Log Size:', o._getRaftLogSize())
 
 if __name__ == '__main__':
-    clear_ports()
+    clear_ports('5000')
     t = threading.Thread(target=run)
     t.start()
     while os.environ['leader'] == "":
