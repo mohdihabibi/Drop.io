@@ -5,11 +5,9 @@ import fileIO.fileService_pb2
 import fileIO.fileService_pb2_grpc
 import psutil
 import os
-from userMode.master import leader
 import sys
 from config.config import my_ip
 from util.leader_exception import LeaderException
-from userMode.change_role import change_role
 
 
 sys.path.append('../')
@@ -28,7 +26,6 @@ class FileService(fileIO.fileService_pb2_grpc.FileserviceServicer):
         self.my_ip = my_ip
 
     def UploadFile(self, request_iterator, context):
-        #TODO: replace it with in disk and memory database
         if DEBUG:
             print "inside upload file slave server"
         for data in request_iterator:
@@ -151,11 +148,12 @@ def serve():
     server.start()
     try:
         while True:
-            if leader == my_ip:
+            if os.environ['leader'] == my_ip:
                 raise LeaderException
             time.sleep(_ONE_DAY_IN_SECONDS)
     except KeyboardInterrupt:
         server.stop(0)
     except LeaderException:
         print "I AM THE NEW LEADER!"
+        from master import change_role
         change_role()

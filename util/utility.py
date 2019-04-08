@@ -10,5 +10,4 @@ def getMyIp():
     myIp = ','.join(my_ips)
 
 def clear_ports():
-    subprocess.run(["kill", "$(lsof -t -i:3000)"])
-    subprocess.run(["kill", "$(lsof -t -i:3001)"])
+    subprocess.call(["sh", "kill.sh"])

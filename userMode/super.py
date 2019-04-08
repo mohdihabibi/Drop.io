@@ -22,7 +22,10 @@ class SimpleFileService(fileservice_grpc.FileserviceServicer):
         self.stat = [None] * len(self.ips)
         self.make_list_of_stubs()
         #TODO: uncomment this in real Demo
-        self.send_leader_info()
+        try:
+            self.send_leader_info()
+        except:
+            print "super node is not live yet!"
         for i, ip in enumerate(self.ips):
             t = threading.Thread(target=self.get_status_of_slaves, args=(ip, i))
             t.start()
