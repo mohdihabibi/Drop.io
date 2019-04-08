@@ -8,9 +8,9 @@ import os
 
 import sys
 
-from util.utility import getMyIp
 
 sys.path.append('../')
+from util.utility import getMyIp
 from storage.database import Database
 
 from config.config import server_config

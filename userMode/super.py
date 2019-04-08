@@ -20,7 +20,7 @@ class SimpleFileService(fileservice_grpc.FileserviceServicer):
         self.client = Database()
         self.list_of_stubs = {}
         #TODO: replace with a list of real IPs
-        self.ips = ['localhost']
+        self.ips = ['192.168.1.16','192.168.1.18']
         self.stat = [None] * len(self.ips)
         self.make_list_of_stubs()
         for i, ip in enumerate(self.ips):
@@ -38,6 +38,7 @@ class SimpleFileService(fileservice_grpc.FileserviceServicer):
 
     def callUpload(self,iterator,ip):
         try:
+#            print "ip is " + ip
             resp = self.list_of_stubs[ip].UploadFile(iterator)
             print resp
         except:
@@ -49,6 +50,8 @@ class SimpleFileService(fileservice_grpc.FileserviceServicer):
 
     def UploadFile(self, request_iterator, context):
         ip = self.get_least_busy_server()
+        print "ip is "
+        print ip
         with open('temp.txt', "w") as f:
             for data in request_iterator:
                 f.write(data.data)
@@ -58,7 +61,7 @@ class SimpleFileService(fileservice_grpc.FileserviceServicer):
                 #TODO: get file name and username from uploaded data
                     seq_list.append(fileservice.FileData(username='mohdi', filename='file', data=seq))
 
-            resp = self.callUpload(self.gen_stream(seq_list), 'localhost')
+            resp = self.callUpload(self.gen_stream(seq_list), ip)
         # print("printing file name : {}",data.filename)
         hashed_val = self.get_hash(data.filename, data.username)
         print hashed_val
@@ -123,13 +126,22 @@ class SimpleFileService(fileservice_grpc.FileserviceServicer):
             )
 
     def get_least_busy_server(self):
-        least = 0
-        ip = ""
+        if(self.stat[0] == None):
+            print "No stats found"
+        least = 100
+        ip = "192.168.1.16"
+        print "stats"
         print self.stat
-        for s in self.stat:
+        for i,s in enumerate(self.stat):
+            print self.stat[i]
+            print self.ips[i]
             if s['cpu_usage'] < least:
-                ip = s.ip
-                least = s.cpu_usage
+                print least 
+                print s['cpu_usage']
+                ip = self.ips[i]
+                least = s['cpu_usage']
+                print ip
+                print least
         return ip
 
     def get_status_of_slaves(self, target, index):
