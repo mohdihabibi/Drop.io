@@ -3,7 +3,6 @@ import time
 import grpc
 import fileService_pb2
 import fileService_pb2_grpc
-from util.db import RedisDatabase
 import psutil
 import os
 from userMode.master import leader
@@ -12,7 +11,9 @@ from config.config import my_ip
 from util.leader_exception import LeaderException
 from userMode.change_role import change_role
 
+
 sys.path.append('../')
+from storage.database import Database
 
 from config.config import server_config
 
@@ -21,34 +22,10 @@ DEBUG = True
 
 class FileService(fileService_pb2_grpc.FileserviceServicer):
 
-    client = RedisDatabase.RedisDatabase()
-    replicationClient = RedisDatabase.RedisDatabase()
+    client = Database()
+#    replicationClient = RedisDatabase.RedisDatabase()
     def __init__(self):
         self.my_ip = my_ip
-
-    def store_data(self, id, data):
-        if DEBUG:
-            print "Inside store data. Data stored with id : {} successfully".format(id)
-        return self.client.conn.set(id, data)
-
-    def store_replicated_data(self, id, data):
-        self.replicationClient.conn.set(id, data)
-        return True
-
-    def get_data(self, id):
-        data = self.client.conn.get(id)
-        if DEBUG:
-            print "Inside get data. Data is : {}".format(id)
-        return data
-
-    def is_data_available(self, id):
-        if self.client.conn.get(id):
-            return True
-        else:
-            return False
-
-    def delete_data(self, id):
-        return self.client.conn.delete(id)
 
     def UploadFile(self, request_iterator, context):
         #TODO: replace it with in disk and memory database
@@ -58,7 +35,7 @@ class FileService(fileService_pb2_grpc.FileserviceServicer):
             print data
         print data.filename
         try:
-            self.store_data(data.filename, data.data)
+            self.client.store_data(data.filename, data.data)
             return fileService_pb2.ack(
                 success=True, message="Data successfully stored!"
             )
@@ -92,8 +69,8 @@ class FileService(fileService_pb2_grpc.FileserviceServicer):
         if DEBUG:
             print "inside download file!"
         filename = request.filename
-        if self.is_data_available(filename):
-            payload = self.get_data(filename)
+        if self.client.is_data_available(filename):
+            payload = self.client.get_data(filename)
             # TODO: replace the file reading piece with binary operation
             # binary = self.strBin(payload)
             # for data in binary:
@@ -127,7 +104,7 @@ class FileService(fileService_pb2_grpc.FileserviceServicer):
 
     def FileDelete(self, request, context):
         filename = request.filename
-        if self.delete_data(filename):
+        if self.client.delete_data(filename):
             return fileService_pb2.ack(
                 success=True, message="Data successfully deleted!"
             )
@@ -139,7 +116,7 @@ class FileService(fileService_pb2_grpc.FileserviceServicer):
     def UpdateFile(self, request_iterator, context):
         data = request_iterator.data
         filename = request_iterator.filename
-        if self.store_data(filename, data):
+        if self.client.store_data(filename, data):
             return fileService_pb2.ack(
                 success=True, message="Data successfully updated!"
             )

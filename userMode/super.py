@@ -7,7 +7,7 @@ import fileIO.fileService_pb2 as fileservice
 import fileIO.fileService_pb2_grpc as fileservice_grpc
 import time
 from concurrent import futures
-from util.db import RedisDatabase
+from storage.database import Database
 from time import sleep
 _ONE_DAY_IN_SECONDS = 60 * 60 * 24
 
@@ -16,7 +16,7 @@ DEBUG = False
 class SimpleFileService(fileservice_grpc.FileserviceServicer):
 
     def __init__(self):
-        self.client = RedisDatabase.RedisDatabase()
+        self.client = Database()
         self.list_of_stubs = {}
         self.ips = list_of_ips
         self.stat = [None] * len(self.ips)
@@ -33,40 +33,12 @@ class SimpleFileService(fileservice_grpc.FileserviceServicer):
             stub = fileservice_grpc.FileserviceStub(channel)
             self.list_of_stubs[ip] = stub
 
-    def store_data(self, id, data):
-        if DEBUG:
-            print "Inside store data. Data stored with id : {} successfully".format(id)
-        return self.client.conn.set(id, data)
-
-    def store_replicated_data(self, id, data):
-        pass
-
-    def get_data(self, id):
-        data = self.client.conn.get(id)
-        if DEBUG:
-            print "Inside get data. Data is : {}".format(id)
-        return data
-
-    def is_data_available(self, id):
-        print "inside data is available"
-        try:
-            if self.client.conn.exists(id):
-                print "here"
-                return True
-            else:
-                print "there"
-                return False
-        except:
-            print "error"
-
-    def delete_data(self, id):
-        return self.client.conn.delete(id)
-
     def get_hash(self,filename, username):
         return str(filename)+str(username)
 
     def callUpload(self,iterator,ip):
         try:
+#            print "ip is " + ip
             resp = self.list_of_stubs[ip].UploadFile(iterator)
             print resp
         except:
@@ -101,6 +73,8 @@ class SimpleFileService(fileservice_grpc.FileserviceServicer):
 
     def UploadFile(self, request_iterator, context):
         ip = self.get_least_busy_server()
+        print "ip is "
+        print ip
         with open('temp.txt', "w") as f:
             for data in request_iterator:
                 f.write(data.data)
@@ -109,11 +83,11 @@ class SimpleFileService(fileservice_grpc.FileserviceServicer):
             for seq in iter(lambda: f.read(1024 * 1024), b""):
                     seq_list.append(fileservice.FileData(username=data.username, filename=data.filename, data=seq))
             #TODO: replace localhost with IP
-            self.callUpload(self.gen_stream(seq_list), 'localhost')
+            self.callUpload(self.gen_stream(seq_list), ip)
         hashed_val = self.get_hash(data.filename, data.username)
         try:
             #TODO: change it to IP
-            self.store_data(hashed_val, 'localhost')
+            self.client.store_data(hashed_val, 'localhost')
         except:
             print "couldn't store in database"
         return fileservice.ack(success=True, message="File is stored!")
@@ -122,10 +96,9 @@ class SimpleFileService(fileservice_grpc.FileserviceServicer):
         print "inside download file"
         hashed_val = self.get_hash(request.filename, request.username)
         print hashed_val
-        if self.is_data_available(hashed_val):
-            if DEBUG:
-                print "inside if statement"
-            ip = self.get_data(hashed_val)
+        if self.client.is_data_available(hashed_val):
+            print "inside if statement"
+            ip = self.client.get_data(hashed_val)
             return self.list_of_stubs[ip].DownloadFile(request)
         else:
             return fileservice.FileData(
@@ -135,7 +108,7 @@ class SimpleFileService(fileservice_grpc.FileserviceServicer):
     #This function doesn't need to be implemented for slave server
     def FileSearch(self, request, context):
         hashed_val = self.get_hash(request)
-        if self.is_data_available(hashed_val):
+        if self.client.is_data_available(hashed_val):
             return fileservice.ack(
                 success=True, message="File is available!"
             )
@@ -154,8 +127,8 @@ class SimpleFileService(fileservice_grpc.FileserviceServicer):
 
     def FileDelete(self, request, context):
         hashed_val = self.get_hash(request)
-        if self.is_data_available(hashed_val):
-            ip = self.get_data(hashed_val)
+        if self.client.is_data_available(hashed_val):
+            ip = self.client.get_data(hashed_val)
             return self.list_of_stubs[ip].FileDelete(request)
         else:
             return fileservice.ack(
@@ -164,8 +137,8 @@ class SimpleFileService(fileservice_grpc.FileserviceServicer):
 
     def UpdateFile(self, request_iterator, context):
         hashed_val = self.get_hash(request_iterator)
-        if self.is_data_available(hashed_val):
-            ip = self.get_data(hashed_val)
+        if self.client.is_data_available(hashed_val):
+            ip = self.client.get_data(hashed_val)
             return self.list_of_stubs[ip].FileUpload(request_iterator)
         else:
             return fileservice.ack(
@@ -173,15 +146,14 @@ class SimpleFileService(fileservice_grpc.FileserviceServicer):
             )
 
     def get_least_busy_server(self):
-        least = 0
+        least = 100
         ip = ""
-        print self.stat
-        for s in self.stat:
+        for i,s in enumerate(self.stat):
             if not s['live']:
                 continue
             if s['cpu_usage'] < least:
-                ip = s.ip
-                least = s.cpu_usage
+                ip = self.ips[i]
+                least = s['cpu_usage']
         return ip
 
     def get_status_of_slaves(self, target, index):
@@ -210,7 +182,4 @@ def serve():
             time.sleep(_ONE_DAY_IN_SECONDS)
     except KeyboardInterrupt:
         server.stop(0)
-
-# if __name__ == '__main__':
-#     serve()
 
