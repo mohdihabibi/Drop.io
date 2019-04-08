@@ -1,12 +1,13 @@
 import threading
 import sys
 import time
+sys.path.append("../")
 from time import sleep
 from config.config import my_ip, list_of_ips
 from util.utility import clear_ports
-sys.path.append("../")
+
 from super import serve as super_server
-from userMode.server import server as slave_server
+import fileIO.server as slave_server
 
 from raft.raft import  TestObj
 leader=""
@@ -57,4 +58,4 @@ if __name__ == '__main__':
         sleep(2)
         super_server()
     else:
-        slave_server()
+        slave_server.serve()

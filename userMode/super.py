@@ -1,7 +1,6 @@
 import sys
 from config.config import list_of_ips, leader_ip, my_ip
 sys.path.append('../')
-import fileIO.server as super_server
 import threading
 import grpc
 import fileIO.fileService_pb2 as fileservice
@@ -10,7 +9,7 @@ import time
 from concurrent import futures
 from util.db import RedisDatabase
 from time import sleep
-
+_ONE_DAY_IN_SECONDS = 60 * 60 * 24
 
 DEBUG = False
 
@@ -208,10 +207,10 @@ def serve():
     server.start()
     try:
         while True:
-            time.sleep(super_server._ONE_DAY_IN_SECONDS)
+            time.sleep(_ONE_DAY_IN_SECONDS)
     except KeyboardInterrupt:
         server.stop(0)
 
-if __name__ == '__main__':
-    serve()
+# if __name__ == '__main__':
+#     serve()
 
